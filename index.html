@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Camera Viewer</title>
+</head>
+
+<body>
+
+<h2>Select Camera</h2>
+
+<select id="cams"></select>
+
+<br><br>
+
+<img id="view" width="640" />
+
+
+<script>
+async function loadCameras() {
+
+  let res = await fetch("/cameras");
+  let cams = await res.json();
+
+  let select = document.getElementById("cams");
+  select.innerHTML = "";
+
+  cams.forEach(cam => {
+    let opt = document.createElement("option");
+    opt.value = cam.id;
+    opt.textContent = cam.label + " (" + cam.id + ")";
+    select.appendChild(opt);
+  });
+
+  if (cams.length > 0) {
+    start(cams[0].id)
+  }
+}
+
+function start(dev) {
+
+  let img = document.getElementById("view");
+
+  img.src = "/stream?dev=" + encodeURIComponent(dev) +
+            "&t=" + Date.now();
+}
+
+document.getElementById("cams").onchange = (e) => {
+  start(e.target.value);
+};
+
+loadCameras();
+</script>
+
+</body>
+</html>
+
